@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Mumble — Minimal integration</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .example-main{max-width:720px;margin:35px auto;padding:0 24px 40px}.example-main h1{font-size:32px;letter-spacing:-1px;line-height:1.2;margin:13px 0}.example-main h1 span{color:var(--accent)}.example-main p{color:var(--muted);font-size:13px;line-height:1.8}.example-main label{display:block;font-size:12px;font-weight:600;margin:20px 0 8px}.example-main textarea,.example-main select{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:11px;max-width:100%;font-size:13px}.example-main textarea{width:100%;min-height:110px;resize:vertical}.example-main select{min-height:43px}.example-actions{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}.example-actions button{min-height:42px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);padding:9px 17px;font-size:12px}.example-actions button.example-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}.example-bubble{min-height:90px;border:1px solid #f0d9d5;border-left:3px solid var(--accent);padding:15px 18px;background:#fff4f2;border-radius:0 12px 12px 0;white-space:pre-wrap;font-size:14px;line-height:1.8}.example-main #status{min-height:24px;font-size:12px}.example-main .example-foot{font-size:11px;margin-top:25px}.example-main a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}.example-ranges{display:grid;grid-template-columns:1fr 1fr;gap:23px}.example-ranges label{display:flex;justify-content:space-between;gap:12px}.example-ranges output{font:11px ui-monospace,monospace;color:var(--accent)}.example-ranges input{width:100%;accent-color:var(--accent)}.example-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--subtle);margin-top:4px}@media(max-width:500px){.example-main{margin-top:26px;padding:0 16px 30px}.example-main h1{font-size:27px}.example-ranges{grid-template-columns:1fr;gap:0}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../" aria-label="Mumble home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>mumble<span class="version">JS / 0.3.0</span></a>
+  <nav aria-label="Main navigation"><a href="../">Playground</a><a href="https://github.com/Franklin-C/mumble/blob/main/API.md">API docs <span aria-hidden="true">↗</span></a></nav>
+  <a class="button button-quiet source-download" href="https://github.com/Franklin-C/mumble/archive/refs/heads/main.zip" download aria-label="Download source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 15v5h14v-5"/></svg><span>Download source</span></a>
+</header>
+<main class="example-main">
+  <div class="eyebrow">Mumble / integration example</div>
+  <h1>A little voice, <span>in a few lines.</span></h1>
+  <p>This page imports the library directly. Pick a voice, blend its type, and shape its mood. Only vowels make sound; silent characters still appear in the dialogue.</p>
+  <label for="preset">Character voice</label>
+  <select id="preset"></select>
+  <div class="example-ranges">
+    <div><label for="mood">Mood <output id="mood-value" for="mood">0.00</output></label><input id="mood" type="range" min="-1" max="1" step="0.01" value="0"><div class="example-scale"><span>Subdued</span><span>Animated</span></div></div>
+    <div><label for="voice-type">Voice type <output id="voice-type-value" for="voice-type">0.50</output></label><input id="voice-type" type="range" min="0" max="1" step="0.01" value="0.5"><div class="example-scale"><span>Blips</span><span>Mumble</span><span>Robot</span></div></div>
+  </div>
+  <label for="text">Dialogue</label>
+  <textarea id="text" maxlength="500">Welcome, traveler! The forest has been waiting for you.</textarea>
+  <div class="example-actions">
+    <button id="play" class="example-primary">Play voice</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="download">Download WAV</button>
+  </div>
+  <div id="dialogue" class="example-bubble" aria-label="Dialogue preview">Your dialogue appears here as the character speaks.</div>
+  <p id="status" role="status" aria-live="polite">Ready. Audio starts when you press Play.</p>
+  <p class="example-foot">Try “A.”, “A?”, “A!”, and “A...” to compare punctuation. See the <a href="https://github.com/Franklin-C/mumble/blob/main/API.md">API reference</a> or <a href="../index.html">full playground</a>.</p>
+</main>
+<script type="module">
+  import { Mumble, PRESETS } from '../lib/mumble.js';
+
+  const $ = id => document.getElementById(id);
+  const voice = new Mumble();
+  let activePlayback;
+  let frame;
+  let run = 0;
+
+  for (const [key, preset] of Object.entries(PRESETS)) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = preset.name;
+    $('preset').append(option);
+  }
+  $('preset').value = 'sprout';
+
+  function updateRanges() {
+    $('mood-value').value = Number($('mood').value).toFixed(2);
+    $('voice-type-value').value = Number($('voice-type').value).toFixed(2);
+  }
+  function setPresetRanges() {
+    $('mood').value = PRESETS[$('preset').value].options.mood;
+    $('voice-type').value = PRESETS[$('preset').value].options.voiceType;
+    updateRanges();
+  }
+  setPresetRanges();
+  $('mood').addEventListener('input', updateRanges);
+  $('voice-type').addEventListener('input', updateRanges);
+
+  function options() {
+    return { ...PRESETS[$('preset').value].options, mood: Number($('mood').value), voiceType: Number($('voice-type').value), seed: 42 };
+  }
+  function stop() {
+    run += 1;
+    cancelAnimationFrame(frame);
+    voice.stop();
+    activePlayback = undefined;
+    $('stop').disabled = true;
+    $('play').textContent = 'Play voice';
+  }
+
+  $('play').addEventListener('click', async () => {
+    stop();
+    const token = run;
+    const text = $('text').value;
+    if (!text.trim()) {
+      $('status').textContent = 'Write a line first.';
+      $('text').focus();
+      return;
+    }
+    try {
+      $('status').textContent = 'Preparing voice…';
+      const playback = await voice.speak(text, options());
+      if (token !== run) { playback.stop(); return; }
+      activePlayback = playback;
+      $('stop').disabled = false;
+      $('play').textContent = 'Restart voice';
+      $('dialogue').textContent = '';
+      $('status').textContent = `${PRESETS[$('preset').value].name} is speaking…`;
+      let index = 0;
+      function animate() {
+        if (token !== run) return;
+        const events = playback.rendered.events;
+        while (index < events.length && events[index].start <= playback.currentTime) {
+          const event = events[index++];
+          $('dialogue').textContent = text.slice(0, event.index + event.char.length);
+        }
+        frame = requestAnimationFrame(animate);
+      }
+      animate();
+      await playback.ended;
+      if (token !== run) return;
+      cancelAnimationFrame(frame);
+      $('dialogue').textContent = text;
+      $('stop').disabled = true;
+      $('play').textContent = 'Play voice';
+      const hasVowels = playback.rendered.events.some(event => event.kind === 'vowel');
+      $('status').textContent = hasVowels ? `Finished · ${playback.rendered.duration.toFixed(2)} seconds` : 'No recognized vowels — this line is silent.';
+      activePlayback = undefined;
+    } catch (error) {
+      if (token !== run) return;
+      $('status').textContent = error.message;
+      $('stop').disabled = true;
+    }
+  });
+
+  $('stop').addEventListener('click', () => {
+    stop();
+    $('status').textContent = 'Playback stopped.';
+  });
+  $('preset').addEventListener('change', () => {
+    stop();
+    setPresetRanges();
+    $('status').textContent = `${PRESETS[$('preset').value].name} selected.`;
+  });
+  $('download').addEventListener('click', () => {
+    if (!$('text').value.trim()) {
+      $('status').textContent = 'Write a line first.';
+      $('text').focus();
+      return;
+    }
+    try {
+      const bytes = voice.toWav($('text').value, options());
+      const url = URL.createObjectURL(new Blob([bytes], {type: 'audio/wav'}));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `mumble-${$('preset').value}.wav`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('status').textContent = 'WAV downloaded.';
+    } catch (error) { $('status').textContent = error.message; }
+  });
+  window.addEventListener('pagehide', event => {
+    stop();
+    if (!event.persisted) void voice.dispose();
+  });
+</script>
+</body>
+</html>

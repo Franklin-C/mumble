@@ -1,0 +1,47 @@
+{
+  "name": "@franklin-ai/mumble",
+  "version": "0.3.0",
+  "description": "Dependency-free vowel-based procedural character voices, with continuous voice controls, deterministic rendering, and WAV export.",
+  "type": "module",
+  "private": true,
+  "main": "./lib/mumble.js",
+  "types": "./lib/mumble.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/mumble.d.ts",
+      "import": "./lib/mumble.js",
+      "default": "./lib/mumble.js"
+    }
+  },
+  "files": [
+    "lib",
+    "index.html",
+    "app.js",
+    "styles.css",
+    "examples",
+    "README.md",
+    "API.md"
+  ],
+  "scripts": {
+    "test": "node --test tests/core.test.mjs"
+  },
+  "keywords": [
+    "audio",
+    "game-audio",
+    "npc",
+    "procedural",
+    "speech",
+    "web-audio"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Franklin-C/mumble.git"
+  },
+  "homepage": "https://franklin-c.github.io/mumble/",
+  "bugs": {
+    "url": "https://github.com/Franklin-C/mumble/issues"
+  }
+}

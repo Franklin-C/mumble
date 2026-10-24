@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f5">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="A little voice for every character. Shape procedural vowel voices with continuous controls, try your dialogue, and export the result.">
+  <title>Mumble — Voice playground</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ffffff'/%3E%3Cg fill='%23d64036'%3E%3Crect x='12' y='24' width='7' height='17' rx='3'/%3E%3Crect x='23' y='13' width='7' height='38' rx='3'/%3E%3Crect x='34' y='19' width='7' height='26' rx='3'/%3E%3Crect x='45' y='27' width='7' height='11' rx='3'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#dialogue">Skip to playground</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Mumble home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>mumble<span class="version">JS / 0.3.0</span></a>
+    <nav aria-label="Main navigation"><a href="./" class="nav-active" aria-current="page">Playground</a><a href="https://github.com/Franklin-C/mumble/blob/main/API.md">Docs <span aria-hidden="true">↗</span></a></nav>
+    <a class="button button-quiet source-download" href="https://github.com/Franklin-C/mumble" aria-label="View source on GitHub"><span data-icon="code"></span><span>GitHub</span></a>
+  </header>
+  <main class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div><div class="eyebrow">A LITTLE SOUND. A LOT OF CHARACTER.</div><h1 id="page-title">Voice playground<span>.</span></h1><p>Start with a preset. Shape every detail. Hear it come to life.</p></div>
+      <div class="local-badge"><span class="status-dot"></span>Made in your browser</div>
+    </section>
+    <div class="lab-layout">
+      <section class="studio-panel panel" aria-label="Voice preview and dialogue">
+        <div class="stage" id="stage" data-character="sprout">
+          <div class="stage-top"><div class="live-label"><span class="status-dot"></span><span id="stage-status">READY WHEN YOU ARE</span></div><span class="stage-caption">LIVE PREVIEW</span></div>
+          <div class="stage-orbit orbit-1" aria-hidden="true"></div><div class="stage-orbit orbit-2" aria-hidden="true"></div>
+          <div class="stage-stars" aria-hidden="true"><span>+</span><span>·</span><span>+</span><span>·</span></div>
+          <div class="speech-bubble" id="speech-bubble"><span id="speech-text">Hey, stranger! Got a minute for a tiny adventure?</span><span class="speech-cursor" aria-hidden="true"></span></div>
+          <div class="avatar-stage" id="avatar-stage" aria-hidden="true"></div>
+          <div class="stage-platform" aria-hidden="true"></div>
+          <div class="character-caption"><strong id="character-name">Sprout</strong><span id="character-label">The forest friend</span></div>
+        </div>
+        <div class="waveform-wrap"><canvas id="waveform" aria-label="Generated audio waveform"></canvas><div class="waveform-time"><span id="playback-time">0:00.0</span><span id="duration">0:00.0</span></div></div>
+        <div class="dialogue-editor">
+          <div class="editor-heading"><label for="dialogue">Give them something to say</label><span id="char-count">0 / 500</span></div>
+          <textarea id="dialogue" rows="3" maxlength="1000" spellcheck="false" placeholder="Write a line of dialogue…">Hey, stranger! Got a minute for a tiny adventure?</textarea>
+          <div class="editor-bottom"><button class="text-button" id="example-button"><span data-icon="shuffle"></span>Try a line</button><div class="punctuation-examples" role="group" aria-label="Hear punctuation examples"><span>Hear</span><button data-punctuation="." title="Play a period: hold the ending and settle down" aria-label="Play period example: hold" aria-pressed="false"><b>.</b><span>Hold</span></button><button data-punctuation="?" title="Play a question: a longer rising ending" aria-label="Play question example: rise" aria-pressed="false"><b>?</b><span>Rise</span></button><button data-punctuation="!" title="Play an exclamation: a strong high-pitched start" aria-label="Play exclamation example: lift" aria-pressed="false"><b>!</b><span>Lift</span></button><button data-punctuation="…" title="Play an ellipsis: a longer hesitation" aria-label="Play ellipsis example: pause" aria-pressed="false"><b>…</b><span>Pause</span></button></div></div>
+        </div>
+        <div class="transport"><button class="button play-button" id="play-button"><span data-icon="play"></span><span id="play-label">Play voice</span><kbd aria-hidden="true">⌘ / Ctrl ↵</kbd></button><button class="button button-secondary" id="wav-button" title="Download generated audio as a WAV file"><span data-icon="download"></span><span>Export WAV</span></button><button class="icon-button loop-button" id="loop-button" aria-label="Loop playback" aria-pressed="false" title="Loop playback"><span data-icon="repeat"></span></button></div>
+        <div class="studio-note"><span id="render-info">Vowels only · 24 kHz mono</span><span id="audio-status" role="status">Ready to play</span></div>
+      </section>
+      <aside class="controls-panel panel" aria-labelledby="controls-title">
+        <div class="preset-picker"><span class="preset-avatar" id="preset-avatar" aria-hidden="true"></span><div class="preset-field"><label for="preset-select">CHARACTER PRESET</label><select id="preset-select" aria-label="Character preset"></select></div></div>
+        <div class="settings-heading"><h2 id="controls-title">Make it your own</h2><button class="text-button" id="reset-button" title="Reset to the selected preset"><span data-icon="reset"></span>Reset</button></div>
+        <div class="sliders" id="sliders"></div>
+        <div class="control-actions"><button class="button button-secondary" id="randomize-button"><span data-icon="shuffle"></span>Surprise me</button><button class="icon-button" id="save-preset-button" aria-label="Download voice preset JSON" title="Save voice preset"><span data-icon="save"></span></button><button class="icon-button" id="import-preset-button" aria-label="Import voice preset JSON" title="Import voice preset"><span data-icon="upload"></span></button><button class="icon-button" id="share-button" aria-label="Copy a link to this voice" title="Copy a link to this voice"><span data-icon="link"></span></button></div>
+        <input type="file" id="preset-file" accept="application/json,.json" hidden>
+      </aside>
+    </div>
+    <div class="rules-note"><span class="vowel-label">A E I O U</span><p>Vowels make the sound. Punctuation gives it expression.</p><a href="https://github.com/Franklin-C/mumble/blob/main/API.md#vowels-punctuation-and-timing">How it works <span aria-hidden="true">↗</span></a></div>
+    <details class="integration-panel panel">
+      <summary><span><span data-icon="cpu"></span>Use this voice in your project</span><span class="integration-hint">JavaScript / JSON <span aria-hidden="true">+</span></span></summary>
+      <div class="code-area"><div class="code-toolbar"><div class="code-tabs" role="group" aria-label="Code format"><button class="active" data-format="javascript" aria-pressed="true">JavaScript</button><button data-format="json" aria-pressed="false">Voice JSON</button></div><button class="text-button" id="copy-button"><span data-icon="copy"></span>Copy code</button></div><pre><code id="code-output"></code></pre><div class="code-footer"><span>Zero dependencies · Browser + Node.js</span><a href="https://github.com/Franklin-C/mumble/blob/main/API.md">Read the API docs ↗</a></div></div>
+    </details>
+    <footer class="page-footer"><span class="footer-brand">mumble<span class="footer-dot">.</span> <span>A little voice for every world.</span></span><div><a href="https://github.com/Franklin-C/mumble/archive/refs/heads/main.zip">Download source</a></div></footer>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <noscript><div class="noscript">Please enable JavaScript to try procedural voice synthesis. You can still <a href="https://github.com/Franklin-C/mumble/archive/refs/heads/main.zip">download the library</a>.</div></noscript>
+</body>
+</html>
